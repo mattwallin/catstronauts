@@ -1,0 +1,42 @@
+networks:
+  default:
+  reverse-proxy_default:
+    external: true
+
+services:
+  api:
+    command: bash
+    environment:
+      # jwilder/nginx_proxy
+      VIRTUAL_HOST: api-catstronauts.006.001agents.com
+      VIRTUAL_PORT: 4000
+    hostname: api.${COMPOSE_PROJECT_NAME}
+    image: node:18
+    restart: unless-stopped
+    stdin_open: true
+    tty: true
+    user: node
+    volumes:
+      - ./server:/home/node/app
+    working_dir: /home/node/app
+
+  ui:
+    command: bash
+    environment:
+      # jwilder/nginx_proxy
+      VIRTUAL_HOST: catstronauts.006.001agents.com
+      VIRTUAL_PORT: 3000
+    hostname: ui.${COMPOSE_PROJECT_NAME}
+    image: node:18
+    networks:
+      default:
+      reverse-proxy_default:
+        aliases:
+          - api-catstronauts.006.001agents.com
+    restart: unless-stopped
+    stdin_open: true
+    tty: true
+    user: node
+    volumes:
+      - ./client:/home/node/app
+    working_dir: /home/node/app
